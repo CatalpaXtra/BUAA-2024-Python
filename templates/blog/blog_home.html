@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        body {
+            background: #dfdfe1;
+        }
+        .navbar {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            margin-right: 10px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            color: #262626 !important;
+        }
+        .navbar .no-hover {
+            pointer-events: none;
+        }
+        .container {
+            margin-top: 50px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        /* .card img {
+            height: 200px;
+            object-fit: cover;
+        } */
+        .card-body .center-content {
+            text-align: center;
+        }
+        .empty-message {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #5091f1;
+            border-color: #5091f1;
+        }
+        .btn-primary:hover {
+            background-color: #4078c0;
+            border-color: #4078c0;
+        }
+    </style>
+    <title>讨论区</title>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home:home' %}">
+                <img src="{% static 'img/logo.webp' %}" alt="Logo" height="50">
+                航味
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:home' %}">讨论区</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'blog:pub_blog' %}">发布帖子</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user:history_pub' %}">我发布的</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user:history_like' %}">我点赞的</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'blog:search' %}" method="GET">
+                    <input type="search" name="q" class="form-control" placeholder="搜索帖子..." aria-label="Search">
+                </form>
+                {% if user.is_authenticated %}
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header><div class="container">
+    <h1 class="text-center my-4">讨论区</h1>
+    <div class="row row-cols-3 row-gap-4">
+        {% for blog in blogs %}
+            <div class="col">
+                <a href="{% url 'blog:blog_detail' blog_id=blog.id %}" style="text-decoration: none;">
+                    <div class="card shadow-sm rounded">
+                        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #f8f9fa;">
+                            <span style="font-family: '黑体', serif; font-size: 24px; color: #343a40;">{{ blog.title }}</span>
+                            <span class="d-flex align-items-center">
+                                <img src="{{ blog.author.userdetail.avatar.url }}" class="rounded-circle me-2" width="30" height="30" alt="">
+                                <span style="color: #6c757d;">{{ blog.author.username }}</span>
+                            </span>
+                        </div>
+                        <div class="card-body" style="height: 100px;">
+                            <p class="card-text" style="color: #495057;">{{ blog.content|striptags|truncatechars:100 }}</p>
+                        </div>
+                        <div class="card-footer text-muted d-flex justify-content-between">
+                            <div style="margin-left: 40px;">发布时间：{{ blog.pub_time|date:"Y年m月d日 H时i分" }}</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

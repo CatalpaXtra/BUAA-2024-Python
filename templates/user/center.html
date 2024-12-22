@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    {% load static %}
+    <meta charset='UTF-8'>
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+    <script src="{% static 'plugins/jquery-3.7.1.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <title>个人中心</title>
+    <style>
+        body {
+            background: #dfdfe1;
+        }
+        .navbar {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            margin-right: 10px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            color: #262626 !important;
+        }
+        .navbar .no-hover {
+            pointer-events: none;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #5091f1;
+            border-color: #5091f1;
+        }
+        .btn-primary:hover {
+            background-color: #4078c0;
+            border-color: #4078c0;
+        }
+        .head {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* 居中对齐 */
+            margin-top: 20px;
+        }
+        .head img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-right: 50px; /* 增加间距 */
+        }
+        .info {
+            font-size: 1.2em;
+        }
+        .info div {
+            margin-bottom: 10px;
+        }
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home:home' %}">
+                <img src="{% static 'img/logo.webp' %}" alt="Logo" height="50">
+                航味
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:modify' %}">修改信息</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:modify_password' %}">修改密码</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:upload_avatar' %}">修改头像</a>
+                    </li>
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div id="app" class="container">
+        <div class="head">
+            <img src="{{ user.userdetail.avatar.url }}" alt="Logo">
+            <div class="info">
+                <div><strong>名称:</strong> {{ user.username }}</div>
+                <div><strong>邮箱:</strong> {{ user.email }}</div>
+                <div><strong>上次登录时间:</strong> {{ user.last_login|date:"Y年m月d日 H时i分" }}</div>
+                <div><strong>年龄:</strong> {{ user.userdetail.age }} 岁</div>
+                <div><strong>性别:</strong> {{ user.userdetail.gender }}</div>
+                <div><strong>身高:</strong> {{ user.userdetail.height }} cm</div>
+                <div><strong>体重:</strong> {{ user.userdetail.weight }} kg</div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <a href="{% url 'user:history_pub' %}" class="btn btn-outline-primary">发布的帖子</a>
+            <a href="{% url 'user:history_like' %}" class="btn btn-outline-primary">点赞的帖子</a>
+            <a href="{% url 'user:history_eaten' %}" class="btn btn-outline-primary">吃过的美食</a>
+            <a href="{% url 'user:history_favorite' %}" class="btn btn-outline-primary">收藏的美食</a>
+            <a href="{% url 'user:history_window' %}" class="btn btn-outline-primary">收藏的窗口</a>
+        </div>
+    </div>
+</body>
+</html>

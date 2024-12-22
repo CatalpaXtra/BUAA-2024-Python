@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <script src="{% static 'plugins/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/forget.js' %}"></script>
+  <meta charset="utf-8">
+  <title>注册</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #dfdfe1 !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      height: 500px;
+    }
+    .login-container h2 {
+      margin-bottom: 20px;
+        font-family: 黑体, serif;
+    }
+    .login-container .input-group1 {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 16px;
+    }
+
+		.login-container .input-group2 {
+      width: 160px;
+      padding: 10px;
+				margin-right: 10px;
+				margin-left: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 16px;
+			text-align: left;
+    }
+
+    .login-container .button1 {
+      width: 100%;
+      padding: 10px;
+      background-color: #3975f3;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+		.login-container .button2 {
+      width: 80px;
+      padding: 10px;
+      background-color: #3975f3;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+			justify-content: center;
+    }
+    .login-container button:hover {
+      background-color: #2a4bb5;
+    }
+  </style>
+  <link rel="stylesheet" href="{% static '/plugins/bootstrap-5.3.0-alpha1-dist/css/bootstrap.css' %}">
+</head>
+<body>
+  <div class="login-container">
+		<div>
+			<img src="{% static 'img/logo.webp' %}" class="brand-logo" alt="" height="50">
+			<span style="font-size: 20px; color: grey"> The Taste of BUAA </span>
+	  </div>
+    <h2 style="text-align: center">忘记密码</h2>
+    <form action="" method="post" style="text-align: center">
+			{% csrf_token %}
+            <br>
+            <input type="text" class="input-group1" id="email" name="email" placeholder="邮箱">
+            <input type="password" class="input-group1" id="password" name="password" placeholder="新密码">
+            <br>
+			<div>
+            <div class="input-group">
+				<span>
+					<input type="text" class="input-group2" id="captcha" name="captcha" placeholder="验证码" aria-label="Recipient's username" aria-describedby="button-addon2">
+				</span>
+				<span>
+					<button class="button2 btn btn-outline-secondary" type="button" id="forget-btn">获取验证码</button>
+				</span>
+          </div>
+      </div>
+      <br>
+      <button class="button1" type="submit">立即设置</button>
+    </form>
+		<div class="text-center mt-4 font-weight-light"><a href="{% url 'user:login' %}" class="text-primary">返回登录</a>
+    </div>
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+    <style>
+        .navbar {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            margin-right: 10px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            color: #262626 !important;
+        }
+        .navbar .no-hover {
+            pointer-events: none;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #5091f1;
+            border-color: #5091f1;
+        }
+        .btn-primary:hover {
+            background-color: #4078c0;
+            border-color: #4078c0;
+        }
+        .head1 {
+            height: 50px;
+            margin-top: 10px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
+        .search1 {
+            border: 2px solid #ccc;
+            border-radius: 10px 0 0 10px;
+            height: 50px;
+            border-right: none;
+        }
+        .search-button {
+            border: 2px solid #5091f1;
+            border-radius: 0 10px 10px 0;
+            width: 80px;
+            height: 50px;
+        }
+
+        .outer-container {
+            border: none;
+            padding: 0;
+        }
+
+        .hidden-block {
+            display: none;
+            position: top;
+            background-color: #f9f9f9;
+            min-width: 200px; /* 增加宽度 */
+            min-height: 200px; /* 增加高度 */
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px 16px;
+            z-index: 10;
+            right: -220px; /* 显示在卡片右边 */
+            top: 0;
+        }
+
+        .hidden-block a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+        }
+
+        .category:hover .hidden-block {
+            display: block;
+        }
+
+        .card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+
+        .dropdown-menu {
+            /* border-radius: 10px; */
+            right: 0;
+            left: auto;
+        }
+        .cuisine-link:hover {
+            color: #5091f1 !important;
+        }
+
+    </style>
+    <script>
+        var myCarousel = document.querySelector('#carouselExampleIndicators');
+        var carousel = new bootstrap.Carousel(myCarousel, {
+            interval: 5000,
+            ride: 'carousel'
+        });
+
+    </script>
+    
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:home' %}">讨论区</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cuisine:recommend' %}">菜品推荐</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item no-hover">
+                        <span class="nav-link">航的味道我知道(◍•ᴗ•◍)✧</span>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item no-hover">
+                            <span class="nav-link">hello, {{ user.username }}!</span>
+                        </li>
+                    {% else %}
+                        <li class="nav-item no-hover">
+                            <span class="nav-link">目前尚未登录！</span>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container" style="background-color: white;">
+        <div class="row">
+            <div class="col-md-3">
+                <img src="{% static 'img/taste.jpg' %}" style="height: 120px;" alt="">
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-6">
+                <form class="d-flex" style="height: 120px; align-items: center;" role="search" action="{% url 'cuisine:search' %}" method="GET">
+                    <input class="form-control search1" name="q" type="search" placeholder="输入菜品或标签名称" aria-label="Search">
+                    <button class="btn btn-outline-primary search-button" type="submit">搜索</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="head1">美食推荐</h2>
+        <a href="{% url 'cuisine:recommend' %}" class="text-muted" style="font-size: 0.9rem; text-decoration: none;">更多</a>
+    </div>
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            {% for cuisine in cuisines %}
+                {% if forloop.counter <= 10 %}
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Slide {{ forloop.counter }}"></button>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="carousel-inner">
+            {% for cuisine in cuisines %}
+                {% if forloop.counter <= 10 %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <a href="/cuisine/{{ cuisine.id }}" style="text-decoration: none;">
+                        <img src="{{ cuisine.image.url }}" class="d-block w-50 mx-auto rounded" alt="Slide {{ forloop.counter }}" style="height: 300px; object-fit: cover;">
+                    </a>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<div class="container mt-4 outer-container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="container mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="head1">菜品分类</h2>
+                </div>
+                <div class="row">
+                    
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">
+                                    <a class="text-decoration-none text-dark" href="/window/breakfast">健康早餐</a>
+                                </h5>
+                            </div>
+                        </div>
+                    
+                    
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">
+                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" href="#collapseMeals" role="button" aria-expanded="false" aria-controls="collapseMeals">
+                                        正餐
+                                    </a>
+                                </h5>
+                                <div class="collapse" id="collapseMeals">
+                                    <ul class="list-unstyled">
+                                        <div class="card">
+                                            <li><a class="text-decoration-none text-dark" data-bs-toggle="collapse" href="#collapseHeyi" role="button" aria-expanded="false" aria-controls="collapseHeyi">合一食堂</a></li>
+                                            <div class="collapse" id="collapseHeyi">
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">二楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/heyi/2/jiachang1">家常菜档口(左侧)</a></li>
+                                                        <li><a href="/window/meal/heyi/2/jiachang2">家常菜档口(右侧)</a></li>
+                                                        <li><a href="/window/meal/heyi/2/kaofan">烤饭档口</a></li>
+                                                        <li><a href="/window/meal/heyi/2/mianshi">面食档口</a></li>
+                                                        <li><a href="/window/meal/heyi/2/shuijiao">手工水饺</a></li>
+                                                        <li><a href="/window/meal/heyi/2/tieban">铁板炒饭炒面</a></li>
+                                                    </div>
+                                                </div>
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">三楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/heyi/3/siji">四季窗口</a></li>
+                                                        <li><a href="/window/meal/heyi/3/kaofan2">烤饭窗口</a></li>
+                                                        <li><a href="/window/meal/heyi/3/fengkuang">疯狂抄手</a></li>
+                                                        <li><a href="/window/meal/heyi/3/gaijiao">盖浇饭窗口</a></li>
+                                                        <li><a href="/window/meal/heyi/3/chongqing">重庆小面</a></li>
+                                                        <li><a href="/window/meal/heyi/3/guotie">锅贴窗口</a></li>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ul>
+                                    <ul class="list-unstyled"> 
+                                        <div class="card">
+                                            <li><a class="text-decoration-none text-dark" data-bs-toggle="collapse" href="#collapseXueer" role="button" aria-expanded="false" aria-controls="collapseXueer">学二食堂</a></li>
+                                            <div class="collapse" id="collapseXueer">
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">一楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/xueer/1/taocan">套餐窗口</a></li>
+                                                        <li><a href="/window/meal/xueer/1/qingzhen">清真窗口</a></li>
+                                                        <li><a href="/window/meal/xueer/1/jingdian">经典窗口</a></li>
+                                                    </div>
+                                                </div>
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">二楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/xueer/2/zixuan">自选窗口</a></li>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ul>
+                                    <ul class="list-unstyled">
+                                        <div class="card">
+                                            <li><a class="text-decoration-none text-dark" data-bs-toggle="collapse" href="#collapseXinbei" role="button" aria-expanded="false" aria-controls="collapseXinbei">新北食堂</a></li>
+                                            <div class="collapse" id="collapseXinbei">
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">负一楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/xinbei/0/yuangu">原蛊蒸饭</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/lushi">炉石披萨</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/zhaji">炸鸡汉堡</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/zhuduji">猪肚鸡</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/wanghong">王宏龙馋嘴鱼</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/shiguo">石锅饭</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/mida">米大碗</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/tiebanchufang">铁板厨房</a></li>
+                                                        <li><a href="/window/meal/xinbei/0/mianfengwei">面丰味</a></li>
+                                                    </div>
+                                                </div>
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">一楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/xinbei/1/zhushi">主食窗口</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/lurou">卤肉饭</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/jiben">基本伙</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/yufen">渔粉</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/zibu">滋补汤品</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/reban">热拌酱菜</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/jingpin">精品菜</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/hangwei">航味菜</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/qingshi">轻食套餐</a></li>
+                                                        <li><a href="/window/meal/xinbei/1/miantiao">面条</a></li>
+                                                    </div>
+                                                </div>
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">二楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/xinbei/2/yipin">一品粥饼</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/wugu">五谷鱼粉</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/guangshi">广式腊肠</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/shougong2">手工水饺</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/guilin">桂林米粉</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/hunan">湖南小碗菜</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/jianbing">煎饼烤冷面</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/gaifan">盖饭</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/shiguo">石锅铁板</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/chongqing2">重庆小面</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/minnan">闽南浇汁拌饭</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/hundun">馄饨</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/yuzi">鱼籽饭</a></li>
+                                                        <li><a href="/window/meal/xinbei/2/huangmen">黄焖鸡</a></li>
+                                                    </div>
+                                                </div>
+                                                <div class="category">
+                                                    <li><a class="text-decoration-none text-dark">三楼</a></li>
+                                                    <div class="hidden-block">
+                                                        <li><a href="/window/meal/xinbei/3/nanshi">南时雨</a></li>
+                                                        <li><a href="/window/meal/xinbei/3/jingcai">璟采</a></li>
+                                                        <li><a href="/window/meal/xinbei/3/huajian">花间</a></li>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title"><a class="text-decoration-none text-dark"></a></h5>
+                                <h5 class="card-title">
+                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" href="#collapseDrinks" role="button" aria-expanded="false" aria-controls="collapseMeals">
+                                        奶茶果汁
+                                    </a>
+                                </h5>
+                                <div class="collapse" id="collapseDrinks">
+                                    <ul class="list-unstyled">
+                                        <div class="card category">
+                                            <li><a class="text-decoration-none text-dark">合一楼</a></li>
+                                            <div class="hidden-block">
+                                                <li><a href="/window/drink/heyi/3/xxyinbabei">三楼小小饮吧（北侧）</a></li>
+                                                <li><a href="/window/drink/heyi/3/xxyinbanan">三楼小小饮吧（南侧）</a></li>
+                                            </div>
+                                        </div>
+                                        <div class="card category">
+                                            <li><a class="text-decoration-none text-dark">新北食堂</a></li>
+                                            <div class="hidden-block">
+                                                <li><a href="/window/drink/xinbei/0/meng">负一楼檬大咖</a></li>
+                                                <li><a href="/window/drink/xinbei/1/shuiba">一楼水吧</a></li>
+                                                <li><a href="/window/drink/xinbei/2/chama">二楼茶·麻</a></li>
+                                            </div>
+                                        </div>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="container mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="head1">美食分布</h2>
+                    <a href="{% url 'home:map' %}" class="text-muted" style="font-size: 0.9rem; text-decoration: none;">放大</a>
+                </div>
+                <div class="card">
+                    <div class="card-body text-center">
+            
+                    </div>
+                    <img src="{% static 'img/map.jpg' %}" class="card-img-top" alt="学校食堂地图" style="height: 300px; object-fit: scale-down;">
+                    <div class="card-body text-center">
+                        <p class="card-text">这里是学院路校区的地图，展示了各个食堂的位置~</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="head1">全新出炉</h2>
+    </div>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for cuisine in cuisines %}
+            {% if forloop.counter <= 8 %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ cuisine.image.url }}" class="card-img-top" alt="{{ cuisine.name }}" style="width: 100%; height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title text-center"><a href="/cuisine/{{ cuisine.id }}" class="text-decoration-none text-dark cuisine-link">{{ cuisine.name }}</a></h5>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="head1">更多的功能还在探索中~</h2>
+    </div>
+</div>
+
+
+<!-- <div class="categories-menu">
+    <h2 style="text-align: center; padding-top: 10px;">菜品分类</h2>
+    <ul class="main-categories">
+        <li class="category" style="font-size: 20px;">健康早餐</li>
+        <div class="hidden-block"></div>
+        <li class="category" style="font-size: 22px;">正餐
+            <ul style="padding: 0; list-style-type: none;">
+                <li class="category" style="text-align: center; font-size: 14px; margin-bottom: 5px;">合一楼</li>
+                <div class="hidden-block">
+
+
+                </div>
+                <li class="category" style="text-align: center; font-size: 14px; margin-bottom: 5px;">学二食堂</li>
+                <div class="hidden-block">
+
+
+                </div>
+                <li class="category" style="text-align: center; font-size: 14px; margin-bottom: 5px;">新北食堂</li>
+                <div class="hidden-block">
+
+
+                </div>
+            </ul>
+        </li>
+        <li class="category" style="font-size: 20px;">奶茶果汁</li>
+        <div class="hidden-block">
+
+
+        </div>
+        <li class="category" style="font-size: 20px; padding-bottom: 10px;">自选称重</li>
+        <div class="hidden-block">
+
+            
+        </div>
+    </ul>
+</div> -->
+
+<!-- <h1>List of Cuisines</h1>
+<ul>
+    {% for cuisine in cuisines %}
+        <li><a href="/cuisine/{{ cuisine.id }}">{{ cuisine.name }}</a></li>
+    {% endfor %}
+    
+    <li><a href="/window/breakfast">点击跳转早餐档口</a></li>
+    
+</ul>
+</body>
+</html> -->

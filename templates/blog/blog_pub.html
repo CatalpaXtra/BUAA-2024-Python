@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布帖子</title>
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <script src="{% static 'plugins/jquery-3.7.1.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'wangeditor/style.css' %}">
+    <script src="{% static 'wangeditor/index.js' %}"></script>
+    <script src="{% static 'js/pub_blog.js' %}"></script>
+    <style>
+        body {
+            background: #dfdfe1;
+        }
+        .navbar {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            margin-right: 10px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            color: #262626 !important;
+        }
+        .navbar .no-hover {
+            pointer-events: none;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #5091f1;
+            border-color: #5091f1;
+        }
+        .btn-primary:hover {
+            background-color: #4078c0;
+            border-color: #4078c0;
+        }
+        #editor-wrapper {
+            border: 1px solid #ccc;
+            z-index: 100; /* 按需定义 */
+        }
+        #toolbar-container {
+            border-bottom: 1px solid #ccc;
+        }
+        #editor-container {
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home:home' %}">
+                <img src="{% static 'img/logo.webp' %}" alt="Logo" height="50">
+                航味
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:home' %}">讨论区</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'blog:pub_blog' %}">发布帖子</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user:history_pub' %}">我发布的</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user:history_like' %}">我点赞的</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'blog:search' %}" method="GET">
+                    <input type="search" name="q" class="form-control" placeholder="搜索帖子..." aria-label="Search">
+                </form>
+                {% if user.is_authenticated %}                  
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>
+<main class="container bg-white p-3 rounded">
+    <h1 class="text-center my-4">发布帖子</h1>
+    <div class="mt-3">
+        <form action="" method="POST">
+        {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">标题</label>
+                <input type="text" name="title" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">分类</label>
+                <select name="category" class="form-select" id="category-select" style="background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 5px; padding: 10px; font-size: 16px; appearance: none; -webkit-appearance: none; -moz-appearance: none; position: relative;">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" style="padding: 10px; background-color: #ffffff; border-bottom: 1px solid #ced4da;">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <style>
+                    #category-select {
+                        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%27http://www.w3.org/2000/svg%27 viewBox%3D%270 0 4 5%27%3E%3Cpath fill%3D%27%23343a40%27 d%3D%27M2 0L0 2h4zm0 5L0 3h4z%27/%3E%3C/svg%3E');
+                        background-repeat: no-repeat;
+                        background-position: right 10px center;
+                        background-size: 8px 10px;
+                    }
+                </style>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">内容</label>
+                <div id="editor-wrapper">
+                    <div id="toolbar-container"><!-- 工具栏 --></div>
+                    <div id="editor-container"><!-- 编辑器 --></div>
+                </div>
+            </div>
+            <div class="mb-3 text-end">
+                <button class="btn btn-primary" id="submit-btn">发布</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

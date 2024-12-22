@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吃过的美食</title>
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+    <script src="{% static 'plugins/jquery-3.7.1.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        body {
+            background: #dfdfe1;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .empty-message {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+        .navbar {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            margin-right: 10px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            color: #262626 !important;
+            /* font: 1em sans-serif; */
+        }
+        .navbar .no-hover {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home:home' %}">
+                <img src="{% static 'img/logo.webp' %}" alt="Logo" height="50">
+                航味
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cuisine:recommend' %}">菜品推荐</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:history_eaten' %}">我吃过的</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:history_favorite' %}">菜品收藏</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:history_window' %}">窗口收藏</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'cuisine:search' %}" method="GET">
+                    <input type="search" name="q" class="form-control" placeholder="输入菜品或标签名称" aria-label="Search">
+                </form>
+                {% if user.is_authenticated %}
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1 class="text-center my-4">吃过的美食</h1>
+        <div class="row">
+            {% for cuisine in eaten_cuisines %}
+                <div class="col-md-4">
+                    <a href="/cuisine/{{ cuisine.id }}" style="text-decoration: none;">
+                        <div class="card shadow-sm rounded text-center">
+                            <div class="card-header" style="background-color: #f8f9fa;">
+                                <img src="{{ cuisine.image.url }}" class="card-img-top rounded" alt="{{ cuisine.name }} image">
+                            </div>
+                            <div class="card-footer" style="background-color: #f8f9fa;">
+                                <span style="font-family: '黑体', serif; font-size: 24px; color: #343a40;">{{ cuisine.name }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-12 empty-message">
+                    您尚未吃过任何美食。
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

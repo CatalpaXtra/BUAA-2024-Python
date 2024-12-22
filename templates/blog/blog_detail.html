@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'highlight/styles/github-dark.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
+    <script src="{% static 'highlight/highlight.min.js' %}"></script>
+    <style>
+        body {
+            background: #dfdfe1;
+        }
+        .navbar {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            margin-right: 10px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            color: #262626 !important;
+        }
+        .navbar .no-hover {
+            pointer-events: none;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #5091f1;
+            border-color: #5091f1;
+        }
+        .btn-primary:hover {
+            background-color: #4078c0;
+            border-color: #4078c0;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home:home' %}">
+                <img src="{% static 'img/logo.webp' %}" alt="Logo" height="50">
+                航味
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'blog:home' %}">讨论区</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'blog:pub_blog' %}">发布帖子</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user:history_pub' %}">我发布的</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user:history_like' %}">我点赞的</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'blog:search' %}" method="GET">
+                    <input type="search" name="q" class="form-control" placeholder="搜索帖子..." aria-label="Search">
+                </form>
+                {% if user.is_authenticated %}
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>
+<main class="container bg-white p-3 rounded">
+    <h1 class="display-4 text-center">{{ blog.title }}</h1>
+    <hr>
+    <div class="d-flex align-items-center mb-3">
+        <img src="{{ blog.author.userdetail.avatar.url }}" class="rounded-circle me-2" width="40" height="40" alt="">
+        <div>
+            <span class="fw-bold">{{ blog.author.username }}</span>
+            <span class="text-muted">于 {{ blog.pub_time|date:"Y年m月d日 H时i分" }} 发布</span>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <span class="badge bg-primary fs-6">点赞人数: {{ blog.likes.all|length }}</span>
+        </div>
+        {% if user.is_authenticated %}
+            <div>
+                {% if like_blog %}
+                    <form action="{% url 'blog:like_blog' blog.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-hand-thumbs-up-fill"></i> 取消赞
+                        </button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'blog:like_blog' blog.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-hand-thumbs-up"></i> 赞
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <span class="badge bg-secondary fs-6">标签: {{category}}</span>
+    </div>
+
+    <hr>
+    <div class="content mb-4">
+        {{ blog.content|safe }}
+    </div>
+    <hr>
+    <div class="comments-section">
+        <h3>评论（{{ blog.comments.all|length }}）</h3>
+        <form action="{% url 'blog:pub_comment' %}" method="POST" onsubmit="return validateComment()">
+            {% csrf_token %}
+            <input type="hidden" name="blog_id" value="{{ blog.id }}">
+            <div class="mb-3">
+                <textarea class="form-control" placeholder="请输入评论" name="content" rows="3"></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">评论</button>
+            </div>
+        </form>
+    </div>
+    <div class="mt-3">
+        <ul class="list-group list-group-flush">
+            {% for comment in blog.comments.all %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ comment.author.userdetail.avatar.url }}" class="rounded-circle me-2" width="40" height="40" alt="">
+                            <span class="fw-bold">{{ comment.author.username }}</span>
+                        </div>
+                        <span class="text-muted">{{ comment.pub_time|date:"Y年m月d日 H时i分" }}</span>
+                    </div>
+                    <div class="mt-2">{{ comment.content }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <script>
+    hljs.highlightAll();
+
+    function validateComment() {
+        const commentContent = document.querySelector('textarea[name="content"]').value.trim();
+        if (!commentContent) {
+            alert('评论内容不能为空！');
+            return false;
+        }
+        return true;
+    }
+    </script>
+</main>
+
+
+

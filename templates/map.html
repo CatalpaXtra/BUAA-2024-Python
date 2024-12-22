@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <title>地图</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        .btn-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        .map-image {
+            max-height: 80vh;
+            max-width: 100%;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="btn-container">
+        <a class="btn btn-primary" href="{% url 'home:home' %}">返回首页</a>
+    </div>
+    <img src="{% static 'img/map.jpg' %}" alt="Map" class="map-image">
+</body>
+</html>

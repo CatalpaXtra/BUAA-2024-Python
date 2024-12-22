@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+    <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+    <script src="{% static 'plugins/jquery-3.7.1.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <title>修改个人信息</title>
+    <style>
+        body {
+            background: #dfdfe1;
+        }
+        .navbar {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            margin-right: 10px;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            color: #262626 !important;
+            /* font: 1em sans-serif; */
+        }
+        .navbar .no-hover {
+            pointer-events: none;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #5091f1;
+            border-color: #5091f1;
+        }
+        .btn-primary:hover {
+            background-color: #4078c0;
+            border-color: #4078c0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home:home' %}">
+                <img src="{% static 'img/logo.webp' %}" alt="Logo" height="50">
+                航味
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:modify' %}">修改信息</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:modify_password' %}">修改密码</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:upload_avatar' %}">修改头像</a>
+                    </li>
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <main id="app" class="container">
+        <div style="max-width: 330px;" class="m-auto">
+            <h1>修改个人信息</h1>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label>昵称</label>
+                    <input type="text" name="username" class="form-control" v-model="username" placeholder="请输入昵称">
+                </div>
+                <div class="mb-3">
+                    <label>年龄</label>
+                    <input type="number" name="age" class="form-control" v-model="age" placeholder="请输入年龄">
+                </div>
+                <div class="mb-3">
+                    <label>性别</label>
+                    <input type="text" name="gender" class="form-control" v-model="gender" placeholder="请输入性别">
+                </div>
+                <div class="mb-3">
+                    <label>身高</label>
+                    <input type="number" name="height" class="form-control" v-model="height" placeholder="请输入身高(cm)">
+                </div>
+                <div class="mb-3">
+                    <label>体重</label>
+                    <input type="number" name="weight" class="form-control" v-model="weight" placeholder="请输入体重(kg)">
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-primary w-100">立即修改</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                username: '{{ username }}',
+                age: '{{ age }}',
+                gender: '{{ gender }}',
+                height: '{{ height }}',
+                weight: '{{ weight }}'
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <meta charset="UTF-8">
+        <title>美食展示</title>
+        <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/star.css' %}" media="all" type="text/css"/>
+        <script src="{% static 'plugins/jquery-3.7.1.min.js' %}"></script>
+        <script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+        <script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #F6F6F6;
+            }
+            .navbar {
+                border-bottom: 1px solid #ddd;
+                margin-bottom: 20px;
+            }
+            .navbar .nav-link {
+                font-size: 18px;
+                margin-right: 10px;
+                transition: color 0.3s, background-color 0.3s;
+            }
+            .navbar .nav-link:hover {
+                color: #262626 !important;
+            }
+            .navbar .no-hover {
+                pointer-events: none;
+            }
+            .container {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            .form-control {
+                border-radius: 5px;
+            }
+            .btn-primary {
+                background-color: #5091f1;
+                border-color: #5091f1;
+            }
+            .btn-primary:hover {
+                background-color: #4078c0;
+                border-color: #4078c0;
+            }
+            .search1 {
+                border: 2px solid #ccc;
+                border-radius: 10px 0 0 10px;
+                height: 50px;
+                border-right: none;
+            }
+            .search-button {
+                border: 2px solid #5091f1;
+                border-radius: 0 10px 10px 0;
+                width: 80px;
+                height: 50px;
+            }
+            .button1 {
+                width: 150px;
+                padding: 10px;
+                background-color: #3975f3;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            .button1:hover {
+                background-color: #2a4bb5;
+            }
+            .tag {
+                display: inline-block;
+                background-color: #87CEFA;
+                padding: 5px 10px;
+                margin-right: 10px;
+                border-radius: 5px;
+            }
+            h2 {
+                color: #333;
+                font-weight: bold;
+            }
+            h3 {
+                color: #666;
+            }
+            h4 {
+                color: #999;
+            }
+            span {
+                color: #666;
+            }
+        </style>
+    </head>
+<body style="background-color: #F6F6F6">
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home:home' %}">
+                <img src="{% static 'img/logo.webp' %}" alt="Logo" height="50">
+                航味
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home:home' %}">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cuisine:recommend' %}">菜品推荐</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:history_eaten' %}">我吃过的</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:history_favorite' %}">菜品收藏</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:history_window' %}">窗口收藏</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'cuisine:search' %}" method="GET">
+                    <input type="search" name="q" class="form-control" placeholder="输入菜品或标签名称" aria-label="Search">
+                </form>
+                {% if user.is_authenticated %}
+                <div class="text-end">
+                    <div class="dropdown"> 
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ user.userdetail.avatar.url }}" alt="mdo" width="40" height="40" class="rounded-circle">
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="{% url 'user:center' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-end">
+                    <a href="{% url 'user:login' %}" class="btn btn-outline-primary me-2">登录</a>
+                    <a href="{% url 'user:register' %}" class="btn btn-primary">注册</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+</header>
+<div class="row" style="margin-top: 20px">
+		<div class="col-md-1" style="margin-right: 40px"></div>
+		<div class="col-md-3">
+			<img src="{{ cuisine.image.url }}" style="width: 90%" alt="{{ cuisine.name }}">
+		</div>
+		<div class="col-md-6" style="background-color: white">
+			<h2>{{ cuisine.name }}</h2>
+			{% if cuisine.cost != -1 %}
+				{% if cuisine.window == '卤味' %}
+					<span style="font-size: 20px;">
+					菜品价格为： {{ cuisine.cost }}元/斤
+					</span>
+				{% elif cuisine.window == '手工水饺' %}
+					<span style="font-size: 20px;">
+					菜品价格为： {{ cuisine.cost }}元/两
+					</span>
+				{% else %}
+					<span style="font-size: 20px;">
+					菜品价格为： {{ cuisine.cost }}元
+					</span>
+				{% endif %}
+			{% endif %}
+
+			{% if cuisine.type == 'meal' or cuisine.type == 'drink' %}
+				<h4 style="margin-top: 20px">位置: {{ cuisine.cafeteria }} {{ cuisine.floor }} {{ cuisine.window }}</h4>
+			{% elif cuisine.type == 'selfselect' %}
+				<h4 style="margin-top: 20px">做法: {{ cuisine.window }} </h4>
+			{% elif cuisine.type == 'breakfast' %}
+				<h4 style="margin-top: 20px">位置: 新北一楼/学二一楼 </h4>
+			{% endif %}
+			
+			<div style="margin-top: 20px;display: inline-block;">
+			
+				<span style="font-size: 20px;">
+				<div id="bg">
+				<div id="over"></div>
+	    </div>
+					当前评分: {% if cuisine.star_ave == -1.0 %} 尚未有人进行评分 {% else %} {{ cuisine.star_ave }} {% endif %}
+				</span>
+				<form style="margin-left:70px;display: inline-block;">
+						<input name="starNum" id="starNum" type="hidden"/>
+							<span class="starability-container">
+								<fieldset class="starability-slot">
+									<input type="radio" id="rate_1_0_1_5" name="starLevel" value="5" />
+									<label for="rate_1_0_1_5" title="5星"></label>
+									<input type="radio" id="rate_1_0_1_4" name="starLevel" value="4" />
+									<label for="rate_1_0_1_4" title="4星"></label>
+									<input type="radio" id="rate_1_0_1_3" name="starLevel" value="3" />
+									<label for="rate_1_0_1_3" title="3星"></label>
+									<input type="radio" id="rate_1_0_1_2" name="starLevel" value="2" />
+									<label for="rate_1_0_1_2" title="2星"></label>
+									<input type="radio" id="rate_1_0_1_1" name="starLevel" value="1" />
+									<label for="rate_1_0_1_1" title="1星"></label>
+								 </fieldset>
+							</span>
+							<span style="font-size: 18px;line-height: 2.9rem;padding: 2px;font-style: oblique;" id="starStr"></span>
+					<span style="margin-left: 20px">
+						<button type="submit" style=" width: 90px;height: 40px" class="btn btn-primary " onclick="evaluation();">确认评分　　　　　
+						</button>
+					</span>
+    		</form>
+			</div>
+			<div style="margin-top: 20px">
+				收藏人数: {{ cuisine.favorites.all|length }}   吃过的人数: {{ cuisine.eatens.all|length }}  评论人数: {{ cuisine.comments.all|length }}
+			</div>
+			<div style="margin-top: 40px">
+            {% if user.is_authenticated %}
+            <div style="display: inline-block;">
+                {% if favorite_cuisine %}
+                    <form action="{% url 'cuisine:favor_cuisine' cuisine.id %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" style="margin-left: 20px" type="submit">取消收藏</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'cuisine:favor_cuisine' cuisine.id %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" style="margin-left: 20px" type="submit">收藏</button>
+                    </form>
+                {% endif %}
+            </div>
+            
+            <div style="display: inline-block;">
+                {% if eaten_cuisine %}
+                    <form action="{% url 'cuisine:eaten_cuisine' cuisine.id %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" style="margin-left: 20px" type="submit">-移除“我吃过的”</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'cuisine:eaten_cuisine' cuisine.id %}" method="POST">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" style="margin-left: 20px" type="submit">+加入“我吃过的”</button>
+                    </form>
+                {% endif %}
+            </div>
+            
+            {% endif %}
+			</div>
+			<style>
+				.tag {
+                    display: inline-block;
+                    background-color: #87CEEB;
+                    color: #fff;
+                    padding: 5px 10px;
+                    margin-right: 10px;
+                    border-radius: 5px;
+                    font-size: 14px;
+                }
+			</style>
+			<div style="margin-top: 20px;">
+                {% if cuisine.tag1 != '' %}
+                    <span class="tag">#{{ cuisine.tag1 }}</span>
+                {% endif %}
+                {% if cuisine.tag2 != '' %}
+                    <span class="tag">#{{ cuisine.tag2 }}</span>
+                {% endif %}
+                {% if cuisine.tag3 != '' %}
+                    <span class="tag">#{{ cuisine.tag3 }}</span>
+                {% endif %}
+            </div>
+		</div>
+	</div>
+	<div class="mt-2">
+        <h3>评论（{{ cuisine.comments.all|length }}）</h3>
+        <form id="commentForm" action="{% url 'cuisine:pub_comment' %}" method="POST" onsubmit="return validateComment()">
+            {% csrf_token %}
+            <input type="hidden" name="cuisine_id" value="{{ cuisine.id }}">
+            <div class="mt-2">
+                <input type="text" class="form-control" placeholder="请输入评论" name="content" id="commentContent">
+            </div>
+            <div class="text-end mt-2">
+                <button type="submit" class="btn btn-primary">评论</button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        function validateComment() {
+            var content = document.getElementById("commentContent").value;
+            if (content.trim() === "") {
+                alert("评论内容不能为空！");
+                return false;
+            }
+            return true;
+        }
+    </script>
+<div class="mt-2">
+    <ul class="list-group list-group-flush">
+        {% for comment in cuisine.comments.all %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between text-body-secondary">
+                    <div class="user-info">
+                        <img src="{{ comment.author.userdetail.avatar.url }}" class="rounded-circle" width="40" height="40" alt="">
+                        <span class="ms-2">{{ comment.author.username }}</span>
+                    </div>
+                    <div class="create-time" style="line-height: 40px;">{{ comment.pub_time|date:"Y年m月d日 H时i分" }}</div>
+                </div>
+                <div class="mt-2">{{ comment.content }}</div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+
+
+	$('[name="starLevel"]').bind("click",function(){
+		console.log($(this)[0].value)
+		$("#starNum").val($(this)[0].value)
+		var starNum = $(this)[0].value;
+		if(starNum == 1) $("#starStr").text("差");
+		if(starNum == 2) $("#starStr").text("一般");
+		if(starNum == 3) $("#starStr").text("良好");
+		if(starNum == 4) $("#starStr").text("优秀");
+		if(starNum == 5) $("#starStr").text("完美");
+	})
+
+
+
+	// 提交评论
+	function evaluation() {
+		//评价等级
+		var customerEvaluationLevel = $('#starNum').val();
+
+		if (customerEvaluationLevel == undefined || customerEvaluationLevel == null || customerEvaluationLevel == '') {
+			alert('请将满意度选好再提交哦！');
+			return false;
+		}
+	}
+
+    function changeWidth() {
+            if ( {{ cuisine.star_ave }} == -1.0){
+                var inputValue = 95;
+                    }
+            else {
+                var inputValue = 19 * {{ cuisine.star_ave }};
+            }
+            var box = document.getElementById('over');
+            box.style.width = inputValue + 'px';
+        }
+    changeWidth()
+
+</script>
+</body>
+</html>
